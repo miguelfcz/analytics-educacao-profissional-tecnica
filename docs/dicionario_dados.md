@@ -87,3 +87,43 @@ Coluna original: `TP_LOCALIZACAO`
 - O dataset tratado em `data/processed/` pode ser usado diretamente no Power BI.
 - A base atual cobre somente o ano de 2025. O ETL pode ser expandido futuramente para outros anos seguindo a mesma logica.
 
+---
+
+## Dataset complementar
+
+Arquivo:
+
+`data/processed/dim_populacao_municipio_2022.csv`
+
+## Descricao
+
+Dimensao de populacao municipal criada a partir da API SIDRA/IBGE, usando a tabela 4714 do Censo Demografico 2022.
+
+Essa base permite calcular indicadores proporcionais, como matriculas tecnicas por 100 mil habitantes.
+
+## Resumo tecnico
+
+| Indicador | Valor |
+|---|---:|
+| Linhas | 5.570 |
+| Colunas | 6 |
+| Populacao total | 203.080.756 |
+| Ano da populacao | 2022 |
+| Fonte | IBGE/SIDRA |
+
+## Colunas
+
+| Coluna | Tipo | Descricao | Origem |
+|---|---|---|---|
+| `ano_populacao` | inteiro | Ano de referencia da populacao. | `D3C` |
+| `codigo_municipio` | inteiro | Codigo do municipio no padrao IBGE. | `D1C` |
+| `municipio` | texto | Nome do municipio. | Derivado de `D1N` |
+| `uf` | texto | Sigla da unidade federativa. | Derivado de `D1N` |
+| `populacao_residente` | inteiro | Populacao residente no municipio em 2022. | `V` |
+| `fonte_populacao` | texto | Descricao da fonte usada para a populacao. | Criado no ETL |
+
+## Validacao cruzada
+
+- Municipios com matriculas tecnicas no dataset de 2025: 3.385
+- Municipios com matriculas tecnicas sem populacao correspondente: 0
+
