@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# Environment
+.env
+
+# Raw data: keep local because files can be large
+data/raw/*
+!data/raw/.gitkeep
+
+# Temporary files
+*.tmp
+~$*
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+
