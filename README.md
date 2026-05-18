@@ -39,7 +39,27 @@ Analytics/
   images/         # prints do dashboard
 ```
 
+## Ambiente Python
+
+Crie e ative o ambiente virtual local:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+Instale as dependencias:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+Validacao rapida:
+
+```powershell
+python -c "import pandas, numpy, requests, openpyxl; print('imports ok')"
+```
+
 ## Status
 
 Etapa atual: preparacao do ambiente e planejamento do ETL.
-
