@@ -127,3 +127,54 @@ Essa base permite calcular indicadores proporcionais, como matriculas tecnicas p
 - Municipios com matriculas tecnicas no dataset de 2025: 3.385
 - Municipios com matriculas tecnicas sem populacao correspondente: 0
 
+---
+
+## Dataset agregado para indicadores territoriais
+
+Arquivo:
+
+`data/processed/indicadores_municipais_educacao_tecnica_2025.csv`
+
+## Descricao
+
+Dataset agregado por municipio com matriculas tecnicas, quantidade de cursos, quantidade de escolas/unidades ofertantes, populacao residente e indicador proporcional de matriculas tecnicas por 100 mil habitantes.
+
+Essa base foi criada a partir da juncao entre:
+
+- `fato_matriculas_tecnicas_2025.csv`
+- `dim_populacao_municipio_2022.csv`
+
+## Granularidade
+
+Cada linha representa um municipio com pelo menos uma matricula tecnica registrada no Censo Escolar 2025.
+
+## Resumo tecnico
+
+| Indicador | Valor |
+|---|---:|
+| Linhas | 3.385 |
+| Colunas | 12 |
+| Total de matriculas tecnicas | 2.490.145 |
+| Ano das matriculas | 2025 |
+| Ano da populacao | 2022 |
+
+## Colunas
+
+| Coluna | Tipo | Descricao | Origem |
+|---|---|---|---|
+| `regiao` | texto | Regiao geografica do Brasil. | `fato_matriculas_tecnicas_2025.csv` |
+| `uf` | texto | Sigla da unidade federativa. | `fato_matriculas_tecnicas_2025.csv` |
+| `codigo_uf` | inteiro | Codigo da unidade federativa. | `fato_matriculas_tecnicas_2025.csv` |
+| `municipio` | texto | Nome do municipio. | `fato_matriculas_tecnicas_2025.csv` |
+| `codigo_municipio` | inteiro | Codigo do municipio no padrao IBGE/INEP. | Chave de integracao |
+| `matriculas_cursos_tecnicos` | inteiro | Total de matriculas tecnicas no municipio. | Agregado de `fato_matriculas_tecnicas_2025.csv` |
+| `qtd_cursos_tecnicos` | inteiro | Soma da quantidade de cursos tecnicos registrados no municipio. | Agregado de `fato_matriculas_tecnicas_2025.csv` |
+| `qtd_escolas_com_curso_tecnico` | inteiro | Quantidade de escolas/unidades com curso tecnico no municipio. | Contagem distinta de `codigo_entidade` |
+| `qtd_cursos_distintos` | inteiro | Quantidade de cursos tecnicos distintos no municipio. | Contagem distinta de `codigo_curso_educacao_profissional` |
+| `ano_populacao` | inteiro | Ano de referencia da populacao usada no indicador proporcional. | `dim_populacao_municipio_2022.csv` |
+| `populacao_residente` | inteiro | Populacao residente do municipio em 2022. | `dim_populacao_municipio_2022.csv` |
+| `matriculas_tecnicas_por_100_mil_hab` | decimal | Indicador proporcional calculado como `matriculas_cursos_tecnicos / populacao_residente * 100000`. | Calculado no ETL |
+
+## Observacao sobre o indicador proporcional
+
+Municipios pequenos podem apresentar taxas muito altas mesmo com numeros absolutos modestos de matriculas. Por isso, no dashboard esse indicador deve ser analisado junto com o total absoluto de matriculas e a populacao residente.
