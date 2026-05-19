@@ -82,6 +82,10 @@ python scripts/etl_indicadores_municipais_2025.py
 
 Mais detalhes estao em [`docs/entrega_etl.md`](docs/entrega_etl.md).
 
+## Continuidade do projeto
+
+As proximas etapas do grupo estao descritas em [`docs/proximas_etapas.md`](docs/proximas_etapas.md), incluindo responsabilidades, entregaveis, sugestoes de paginas do dashboard, KPIs e fluxo de trabalho no Git.
+
 ## Status
 
 Etapa atual: preparacao do ambiente e planejamento do ETL.
