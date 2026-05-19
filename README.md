@@ -60,6 +60,28 @@ Validacao rapida:
 python -c "import pandas, numpy, requests, openpyxl; print('imports ok')"
 ```
 
+## Entrega de dados e ETL
+
+A etapa de dados gera tres CSVs tratados em `data/processed/`:
+
+| Arquivo | Uso |
+|---|---|
+| `fato_matriculas_tecnicas_2025.csv` | Base principal detalhada de cursos tecnicos e matriculas |
+| `dim_populacao_municipio_2022.csv` | Populacao residente por municipio, via IBGE/SIDRA |
+| `indicadores_municipais_educacao_tecnica_2025.csv` | Base agregada por municipio com indicador por 100 mil habitantes |
+
+Esses arquivos podem ser importados diretamente no Power BI pela etapa de modelagem.
+
+Para reproduzir o ETL, baixe os microdados do Censo Escolar 2025 no site do INEP, extraia em `data/raw/microdados_censo_escolar_2025/` e rode:
+
+```powershell
+python scripts/etl_censo_escolar_2025.py
+python scripts/etl_ibge_populacao_2022.py
+python scripts/etl_indicadores_municipais_2025.py
+```
+
+Mais detalhes estao em [`docs/entrega_etl.md`](docs/entrega_etl.md).
+
 ## Status
 
 Etapa atual: preparacao do ambiente e planejamento do ETL.
