@@ -28,6 +28,11 @@ Fonte complementar para populacao.
 - Tipo: API/tabelas publicas
 - Uso no projeto: calcular indicadores proporcionais, como matriculas tecnicas por 100 mil jovens
 - Link: https://sidra.ibge.gov.br/
+- Tabela usada no ETL: 4714 - Populacao residente, area territorial e densidade demografica
+- Variavel usada no ETL: 93 - Populacao residente
+- Periodo usado no ETL: 2022
+- Nivel territorial usado no ETL: municipio
+- URL da API usada: https://apisidra.ibge.gov.br/values/t/4714/n6/all/v/93/p/2022?formato=json
 
 ## 4. RAIS/CAGED
 
@@ -37,4 +42,3 @@ Fonte opcional. Deve ficar como evolucao futura, pois aumenta bastante a complex
 - Tipo: microdados publicos
 - Uso possivel: relacionar oferta de educacao tecnica com mercado de trabalho formal
 - Link: https://www.gov.br/trabalho-e-emprego/pt-br/assuntos/estatisticas-trabalho
-

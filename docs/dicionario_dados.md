@@ -1,17 +1,180 @@
 # Dicionario de dados
 
-Este arquivo sera preenchido conforme as bases tratadas forem geradas.
+## Dataset tratado
 
-## Tabela: fato_matriculas_tecnicas
+Arquivo:
+
+`data/processed/fato_matriculas_tecnicas_2025.csv`
+
+## Descricao
+
+Base tratada com informacoes de cursos tecnicos e matriculas tecnicas do Censo Escolar 2025. O dataset foi gerado a partir da juncao entre:
+
+- `Tabela_Curso_Tecnico_2025.csv`
+- `Tabela_Escola_2025.csv`
+
+A chave de integracao usada foi:
+
+- `NU_ANO_CENSO`
+- `CO_ENTIDADE`
+
+## Granularidade
+
+Cada linha representa um curso tecnico ofertado por uma escola/unidade em 2025, com informacoes territoriais, rede de ensino, localizacao, area profissional, curso e quantidades de matriculas.
+
+## Resumo tecnico
+
+| Indicador | Valor |
+|---|---:|
+| Linhas | 32.136 |
+| Colunas | 22 |
+| Total de matriculas tecnicas | 2.490.145 |
+| Ano | 2025 |
+| Fonte | Censo Escolar / INEP |
+
+## Colunas
 
 | Coluna | Tipo | Descricao | Origem |
 |---|---|---|---|
-| ano | inteiro | Ano de referencia dos dados | INEP |
-| codigo_uf | texto/inteiro | Codigo da UF | INEP |
-| uf | texto | Sigla da unidade federativa | INEP |
-| codigo_municipio | texto/inteiro | Codigo do municipio | INEP |
-| municipio | texto | Nome do municipio | INEP |
-| rede | texto | Rede/dependencia administrativa | INEP |
-| tipo_oferta | texto | Tipo de oferta ou modalidade da educacao profissional | INEP |
-| total_matriculas | inteiro | Total de matriculas tecnicas agregadas | INEP |
+| `ano` | inteiro | Ano de referencia do Censo Escolar. | `NU_ANO_CENSO` |
+| `regiao` | texto | Regiao geografica do Brasil onde a escola esta localizada. | `NO_REGIAO` |
+| `uf` | texto | Sigla da unidade federativa. | `SG_UF` |
+| `codigo_uf` | inteiro | Codigo da unidade federativa no padrao IBGE/INEP. | `CO_UF` |
+| `municipio` | texto | Nome do municipio da escola/unidade. | `NO_MUNICIPIO` |
+| `codigo_municipio` | inteiro | Codigo do municipio no padrao IBGE/INEP. | `CO_MUNICIPIO` |
+| `codigo_entidade` | inteiro | Codigo da escola/unidade no Censo Escolar. | `CO_ENTIDADE` |
+| `nome_entidade` | texto | Nome da escola/unidade. | `NO_ENTIDADE` |
+| `rede` | texto | Rede/dependencia administrativa da escola: Federal, Estadual, Municipal ou Privada. | `TP_DEPENDENCIA` |
+| `localizacao` | texto | Localizacao da escola: Urbana ou Rural. | `TP_LOCALIZACAO` |
+| `area_curso_profissional` | texto | Area profissional do curso tecnico. | `NO_AREA_CURSO_PROFISSIONAL` |
+| `codigo_area_curso_profissional` | inteiro | Codigo da area profissional do curso tecnico. | `ID_AREA_CURSO_PROFISSIONAL` |
+| `curso_educacao_profissional` | texto | Nome do curso de educacao profissional. | `NO_CURSO_EDUC_PROFISSIONAL` |
+| `codigo_curso_educacao_profissional` | inteiro | Codigo do curso de educacao profissional. | `CO_CURSO_EDUC_PROFISSIONAL` |
+| `qtd_cursos_tecnicos` | inteiro | Quantidade de cursos tecnicos registrados para a escola/curso. | `QT_CURSO_TEC` |
+| `matriculas_cursos_tecnicos` | inteiro | Total de matriculas em cursos tecnicos. | `QT_MAT_CURSO_TEC` |
+| `matriculas_itinerario_formacao_tecnica_profissional` | inteiro | Matriculas em cursos tecnicos relacionadas ao itinerario de formacao tecnica e profissional. | `QT_MAT_CURSO_TEC_IFTP` |
+| `matriculas_curso_tecnico_nivel_medio` | inteiro | Matriculas em curso tecnico de nivel medio, conforme classificacao do Censo Escolar. | `QT_MAT_CURSO_TEC_NM` |
+| `matriculas_curso_tecnico_concomitante` | inteiro | Matriculas em curso tecnico concomitante. | `QT_MAT_CURSO_TEC_CONC` |
+| `matriculas_curso_tecnico_subsequente` | inteiro | Matriculas em curso tecnico subsequente. | `QT_MAT_CURSO_TEC_SUBS` |
+| `matriculas_curso_tecnico_itinerario_ct` | inteiro | Matriculas em curso tecnico associado ao itinerario tecnico-profissional, conforme coluna original do INEP. | `QT_MAT_CURSO_TEC_IFTP_CT` |
+| `matriculas_curso_tecnico_eja` | inteiro | Matriculas em curso tecnico integrado ou relacionado a EJA. | `QT_MAT_CURSO_TEC_EJA` |
 
+## Mapeamentos aplicados
+
+### Rede/dependencia administrativa
+
+Coluna original: `TP_DEPENDENCIA`
+
+| Codigo | Valor tratado |
+|---:|---|
+| 1 | Federal |
+| 2 | Estadual |
+| 3 | Municipal |
+| 4 | Privada |
+
+### Localizacao
+
+Coluna original: `TP_LOCALIZACAO`
+
+| Codigo | Valor tratado |
+|---:|---|
+| 1 | Urbana |
+| 2 | Rural |
+
+## Observacoes
+
+- Os arquivos brutos permanecem em `data/raw/` e nao sao versionados no Git por causa do tamanho.
+- O dataset tratado em `data/processed/` pode ser usado diretamente no Power BI.
+- A base atual cobre somente o ano de 2025. O ETL pode ser expandido futuramente para outros anos seguindo a mesma logica.
+
+---
+
+## Dataset complementar
+
+Arquivo:
+
+`data/processed/dim_populacao_municipio_2022.csv`
+
+## Descricao
+
+Dimensao de populacao municipal criada a partir da API SIDRA/IBGE, usando a tabela 4714 do Censo Demografico 2022.
+
+Essa base permite calcular indicadores proporcionais, como matriculas tecnicas por 100 mil habitantes.
+
+## Resumo tecnico
+
+| Indicador | Valor |
+|---|---:|
+| Linhas | 5.570 |
+| Colunas | 6 |
+| Populacao total | 203.080.756 |
+| Ano da populacao | 2022 |
+| Fonte | IBGE/SIDRA |
+
+## Colunas
+
+| Coluna | Tipo | Descricao | Origem |
+|---|---|---|---|
+| `ano_populacao` | inteiro | Ano de referencia da populacao. | `D3C` |
+| `codigo_municipio` | inteiro | Codigo do municipio no padrao IBGE. | `D1C` |
+| `municipio` | texto | Nome do municipio. | Derivado de `D1N` |
+| `uf` | texto | Sigla da unidade federativa. | Derivado de `D1N` |
+| `populacao_residente` | inteiro | Populacao residente no municipio em 2022. | `V` |
+| `fonte_populacao` | texto | Descricao da fonte usada para a populacao. | Criado no ETL |
+
+## Validacao cruzada
+
+- Municipios com matriculas tecnicas no dataset de 2025: 3.385
+- Municipios com matriculas tecnicas sem populacao correspondente: 0
+
+---
+
+## Dataset agregado para indicadores territoriais
+
+Arquivo:
+
+`data/processed/indicadores_municipais_educacao_tecnica_2025.csv`
+
+## Descricao
+
+Dataset agregado por municipio com matriculas tecnicas, quantidade de cursos, quantidade de escolas/unidades ofertantes, populacao residente e indicador proporcional de matriculas tecnicas por 100 mil habitantes.
+
+Essa base foi criada a partir da juncao entre:
+
+- `fato_matriculas_tecnicas_2025.csv`
+- `dim_populacao_municipio_2022.csv`
+
+## Granularidade
+
+Cada linha representa um municipio com pelo menos uma matricula tecnica registrada no Censo Escolar 2025.
+
+## Resumo tecnico
+
+| Indicador | Valor |
+|---|---:|
+| Linhas | 3.385 |
+| Colunas | 12 |
+| Total de matriculas tecnicas | 2.490.145 |
+| Ano das matriculas | 2025 |
+| Ano da populacao | 2022 |
+
+## Colunas
+
+| Coluna | Tipo | Descricao | Origem |
+|---|---|---|---|
+| `regiao` | texto | Regiao geografica do Brasil. | `fato_matriculas_tecnicas_2025.csv` |
+| `uf` | texto | Sigla da unidade federativa. | `fato_matriculas_tecnicas_2025.csv` |
+| `codigo_uf` | inteiro | Codigo da unidade federativa. | `fato_matriculas_tecnicas_2025.csv` |
+| `municipio` | texto | Nome do municipio. | `fato_matriculas_tecnicas_2025.csv` |
+| `codigo_municipio` | inteiro | Codigo do municipio no padrao IBGE/INEP. | Chave de integracao |
+| `matriculas_cursos_tecnicos` | inteiro | Total de matriculas tecnicas no municipio. | Agregado de `fato_matriculas_tecnicas_2025.csv` |
+| `qtd_cursos_tecnicos` | inteiro | Soma da quantidade de cursos tecnicos registrados no municipio. | Agregado de `fato_matriculas_tecnicas_2025.csv` |
+| `qtd_escolas_com_curso_tecnico` | inteiro | Quantidade de escolas/unidades com curso tecnico no municipio. | Contagem distinta de `codigo_entidade` |
+| `qtd_cursos_distintos` | inteiro | Quantidade de cursos tecnicos distintos no municipio. | Contagem distinta de `codigo_curso_educacao_profissional` |
+| `ano_populacao` | inteiro | Ano de referencia da populacao usada no indicador proporcional. | `dim_populacao_municipio_2022.csv` |
+| `populacao_residente` | inteiro | Populacao residente do municipio em 2022. | `dim_populacao_municipio_2022.csv` |
+| `matriculas_tecnicas_por_100_mil_hab` | decimal | Indicador proporcional calculado como `matriculas_cursos_tecnicos / populacao_residente * 100000`. | Calculado no ETL |
+
+## Observacao sobre o indicador proporcional
+
+Municipios pequenos podem apresentar taxas muito altas mesmo com numeros absolutos modestos de matriculas. Por isso, no dashboard esse indicador deve ser analisado junto com o total absoluto de matriculas e a populacao residente.

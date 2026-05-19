@@ -39,7 +39,53 @@ Analytics/
   images/         # prints do dashboard
 ```
 
+## Ambiente Python
+
+Crie e ative o ambiente virtual local:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+Instale as dependencias:
+
+```powershell
+python -m pip install -r requirements.txt
+```
+
+Validacao rapida:
+
+```powershell
+python -c "import pandas, numpy, requests, openpyxl; print('imports ok')"
+```
+
+## Entrega de dados e ETL
+
+A etapa de dados gera tres CSVs tratados em `data/processed/`:
+
+| Arquivo | Uso |
+|---|---|
+| `fato_matriculas_tecnicas_2025.csv` | Base principal detalhada de cursos tecnicos e matriculas |
+| `dim_populacao_municipio_2022.csv` | Populacao residente por municipio, via IBGE/SIDRA |
+| `indicadores_municipais_educacao_tecnica_2025.csv` | Base agregada por municipio com indicador por 100 mil habitantes |
+
+Esses arquivos podem ser importados diretamente no Power BI pela etapa de modelagem.
+
+Para reproduzir o ETL, baixe os microdados do Censo Escolar 2025 no site do INEP, extraia em `data/raw/microdados_censo_escolar_2025/` e rode:
+
+```powershell
+python scripts/etl_censo_escolar_2025.py
+python scripts/etl_ibge_populacao_2022.py
+python scripts/etl_indicadores_municipais_2025.py
+```
+
+Mais detalhes estao em [`docs/entrega_etl.md`](docs/entrega_etl.md).
+
+## Continuidade do projeto
+
+As proximas etapas do grupo estao descritas em [`docs/proximas_etapas.md`](docs/proximas_etapas.md), incluindo responsabilidades, entregaveis, sugestoes de paginas do dashboard, KPIs e fluxo de trabalho no Git.
+
 ## Status
 
 Etapa atual: preparacao do ambiente e planejamento do ETL.
-
