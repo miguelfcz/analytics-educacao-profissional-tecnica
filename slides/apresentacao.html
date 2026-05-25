@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Educacao Tecnica no Brasil</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#0A1628;--navy2:#0F2040;--blue:#1A5FA8;--cyan:#00C5D4;
+  --white:#FFFFFF;--muted:#8FA3BF;--green:#0DBB7E;--amber:#F5A623;
+  --coral:#FF5B5B;--card:#162035;--border:rgba(0,197,212,0.18);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
+body{font-family:'DM Sans',sans-serif}
+#deck{width:100vw;height:100vh;position:relative}
+.slide{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;padding:48px 80px;
+  opacity:0;pointer-events:none;
+  transition:opacity .5s ease,transform .5s ease;transform:translateY(22px);
+}
+.slide.active{opacity:1;pointer-events:all;transform:translateY(0)}
+.slide.leaving{opacity:0;transform:translateY(-22px);pointer-events:none}
+.grid{position:absolute;inset:0;pointer-events:none;overflow:hidden;
+  background-image:linear-gradient(rgba(0,197,212,.04) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,197,212,.04) 1px,transparent 1px);
+  background-size:60px 60px}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none}
+
+/* Type */
+.lbl{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
+h2{font-family:'Syne',sans-serif;font-size:clamp(22px,3vw,38px);font-weight:700;color:var(--white);line-height:1.1}
+h3{font-family:'Syne',sans-serif;font-size:clamp(13px,1.6vw,18px);font-weight:600;color:var(--cyan);margin-bottom:8px}
+.sub{font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:14px}
+.bignum{font-family:'Syne',sans-serif;font-size:clamp(40px,5.5vw,76px);font-weight:800;color:var(--cyan);line-height:1}
+.bignum small{font-size:.42em;color:var(--muted);font-weight:400}
+
+/* Layout */
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:18px;width:100%}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;width:100%}
+
+/* Card / KPI */
+.card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:18px 20px}
+.kpis{display:flex;gap:13px;width:100%;flex-wrap:wrap}
+.kpi{flex:1;min-width:110px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:15px 17px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--cyan)}
+.kpi.g::before{background:var(--green)}.kpi.a::before{background:var(--amber)}.kpi.r::before{background:var(--coral)}
+.kv{font-family:'Syne',sans-serif;font-size:clamp(18px,2.2vw,30px);font-weight:800;color:var(--white)}
+.kl{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
+
+/* Highlight box */
+.hb{border-left:4px solid var(--cyan);padding:11px 15px;background:rgba(0,197,212,.06);border-radius:0 9px 9px 0;font-size:13px;color:var(--white);line-height:1.6}
+.hb.g{border-color:var(--green);background:rgba(13,187,126,.06)}
+.hb.a{border-color:var(--amber);background:rgba(245,166,35,.06)}
+.hb.r{border-color:var(--coral);background:rgba(255,91,91,.06)}
+
+/* Bars */
+.bars{display:flex;flex-direction:column;gap:9px;width:100%}
+.bi{display:flex;flex-direction:column;gap:4px}
+.bm{display:flex;justify-content:space-between;font-size:12px}
+.bn{color:var(--white);font-weight:500}.bv{color:var(--cyan);font-family:'Syne',sans-serif;font-weight:700;font-size:12px}
+.bt{height:8px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.bf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--blue),var(--cyan));transform:scaleX(0);transform-origin:left;transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+.bf.g{background:linear-gradient(90deg,#0a6e48,var(--green))}
+.bf.a{background:linear-gradient(90deg,#7a4a00,var(--amber))}
+.bf.r{background:linear-gradient(90deg,#7a0000,var(--coral))}
+.slide.active .bf{transform:scaleX(1)}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:8px 11px;text-align:left;color:var(--cyan);font-family:'Syne',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border);background:rgba(0,197,212,.05)}
+.tbl td{padding:7px 11px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.04)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td:first-child{color:var(--white);font-weight:500}
+.tbl tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.hi{color:var(--cyan);font-weight:700}
+
+/* Rec list */
+.rl{display:flex;flex-direction:column;gap:9px;width:100%}
+.ri{display:grid;grid-template-columns:36px 1fr;gap:10px;align-items:center;padding:11px 13px;background:var(--card);border:1px solid var(--border);border-radius:9px}
+.ric{width:36px;height:36px;border-radius:8px;background:rgba(0,197,212,.1);display:flex;align-items:center;justify-content:center;font-size:16px}
+.rt{font-size:12px;color:var(--muted);line-height:1.5}
+.rt strong{color:var(--white);display:block;font-size:13px;margin-bottom:1px}
+
+/* Team */
+.tc{text-align:center;padding:18px 14px;background:var(--card);border:1px solid var(--border);border-radius:13px}
+.av{width:48px;height:48px;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--navy)}
+.av.c{background:var(--cyan)}.av.g{background:var(--green)}.av.a{background:var(--amber)}.av.r{background:var(--coral)}
+.tn{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--white);margin-bottom:4px}
+.tr{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* Capa */
+.ct{font-family:'Syne',sans-serif;font-size:clamp(36px,5.5vw,66px);font-weight:800;color:var(--white);line-height:1;text-align:center}
+.ct em{color:var(--cyan);font-style:normal}
+.chip{display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);background:rgba(0,197,212,.08);color:var(--cyan)}
+
+/* Animations */
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.slide.active .a1{animation:fu .55s .05s cubic-bezier(.16,1,.3,1) both}
+.slide.active .a2{animation:fu .55s .13s cubic-bezier(.16,1,.3,1) both}
+.slide.active .a3{animation:fu .55s .21s cubic-bezier(.16,1,.3,1) both}
+.slide.active .a4{animation:fu .55s .29s cubic-bezier(.16,1,.3,1) both}
+.slide.active .a5{animation:fu .55s .37s cubic-bezier(.16,1,.3,1) both}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* HUD */
+#progress{position:fixed;bottom:0;left:0;height:3px;background:var(--cyan);transition:width .4s;z-index:100}
+#hud{position:fixed;bottom:18px;right:24px;display:flex;align-items:center;gap:11px;z-index:100}
+.nb{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:rgba(15,32,64,.85);backdrop-filter:blur(8px);color:var(--cyan);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;user-select:none}
+.nb:hover{background:rgba(0,197,212,.15);border-color:var(--cyan)}
+#sc{font-size:12px;color:var(--muted);font-family:'Syne',sans-serif}
+.src{position:absolute;bottom:17px;left:80px;font-size:10px;color:rgba(143,163,191,.3)}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="hud">
+  <button class="nb" onclick="nav(-1)">&#8592;</button>
+  <span id="sc">1 / 10</span>
+  <button class="nb" onclick="nav(1)">&#8594;</button>
+</div>
+<div id="deck">
+
+<!-- ══ 1. CAPA ══════════════════════════════════════════════════ -->
+<div class="slide active" id="s1" style="background:linear-gradient(135deg,#0A1628 0%,#0F2A50 100%)">
+  <div class="grid"></div>
+  <div class="orb" style="width:460px;height:460px;background:rgba(0,197,212,.06);top:-110px;right:-110px"></div>
+  <div class="orb" style="width:340px;height:340px;background:rgba(26,95,168,.1);bottom:-70px;left:-70px"></div>
+  <div class="a1" style="margin-bottom:16px"><span class="chip">Analytics — Educacao Profissional e Tecnica</span></div>
+  <div class="ct a2">Educacao Tecnica<br>no <em>Brasil</em></div>
+  <p class="sub a3" style="text-align:center;margin-top:12px;font-size:15px">Onde estao as oportunidades de formacao profissional?</p>
+  <div class="a4" style="margin-top:36px;display:flex;gap:32px;flex-wrap:wrap;justify-content:center;align-items:center">
+    <div style="text-align:center"><div class="bignum">2,49M<small> mat.</small></div><div style="font-size:11px;color:var(--muted);margin-top:4px">Total de matriculas</div></div>
+    <div style="width:1px;height:44px;background:var(--border)"></div>
+    <div style="text-align:center"><div class="bignum">32K<small> cursos</small></div><div style="font-size:11px;color:var(--muted);margin-top:4px">Cursos tecnicos</div></div>
+    <div style="width:1px;height:44px;background:var(--border)"></div>
+    <div style="text-align:center"><div class="bignum">12K<small> inst.</small></div><div style="font-size:11px;color:var(--muted);margin-top:4px">Instituicoes</div></div>
+  </div>
+  <div class="a5" style="margin-top:30px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+    <span style="font-size:13px;color:var(--muted)">Miguel</span><span style="color:var(--border)">·</span>
+    <span style="font-size:13px;color:var(--muted)">Matheus Soares</span><span style="color:var(--border)">·</span>
+    <span style="font-size:13px;color:var(--muted)">Matheus Egito</span><span style="color:var(--border)">·</span>
+    <span style="font-size:13px;color:var(--muted)">Mateus</span><span style="color:var(--border)">·</span>
+    <span style="font-size:13px;color:var(--muted)">Clovis</span>
+  </div>
+  <div class="src">Censo da Educacao Basica 2025 — INEP | Fevereiro/2026</div>
+</div>
+
+<!-- ══ 2. CONTEXTO + QUESTAO ═══════════════════════════════════ -->
+<div class="slide" id="s2" style="background:var(--navy2)">
+  <div class="grid"></div>
+  <div class="orb" style="width:360px;height:360px;background:rgba(26,95,168,.1);top:-60px;left:-60px"></div>
+  <div style="max-width:860px;width:100%">
+    <div class="lbl a1">Contexto e Problema</div>
+    <h2 class="a2" style="margin-bottom:20px">Por que analisar a Educacao Tecnica?</h2>
+    <div class="cols2 a3">
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="hb">A EPT funciona como <strong>ponte entre a escola e o mercado de trabalho</strong>, qualificando jovens para ocupacoes de alta demanda.</div>
+        <div class="hb g">Impacta diretamente a <strong>empregabilidade</strong> e o <strong>desenvolvimento regional</strong> em todo o Brasil.</div>
+        <div class="hb a">A oferta pode estar <strong>concentrada</strong> em poucas regioes, redes e areas — gerando desigualdades estruturais.</div>
+        <div class="hb" style="margin-top:4px;font-size:12px;color:var(--muted)">
+          <strong style="color:var(--white);display:block;margin-bottom:4px">Questao central:</strong>
+          Como a EPT esta distribuida no Brasil, e quais desigualdades aparecem por regiao, UF, municipio, rede de ensino e tipo de curso?
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="kpi"><div class="kv">42,53%</div><div class="kl">das matriculas concentradas no Sudeste</div></div>
+        <div class="kpi g"><div class="kv">58,76%</div><div class="kl">dos cursos na rede Estadual (19 mil)</div></div>
+        <div class="kpi a"><div class="kv">20:1</div><div class="kl">razao matriculas urbanas vs. rurais</div></div>
+        <div class="kpi r"><div class="kv">207</div><div class="kl">matriculas medias por instituicao</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3. EQUIPE + METODOLOGIA ════════════════════════════════ -->
+<div class="slide" id="s3" style="background:var(--navy)">
+  <div class="grid"></div>
+  <div style="max-width:880px;width:100%">
+    <div class="lbl a1">Equipe e Metodologia</div>
+    <h2 class="a2" style="margin-bottom:20px">Quem fez o que — e como</h2>
+    <div class="a3" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;width:100%;margin-bottom:18px">
+      <div class="tc"><div class="av c">MG</div><div class="tn">Miguel</div><div class="tr">Dados e ETL completo</div></div>
+      <div class="tc"><div class="av g">ME</div><div class="tn">Matheus Egito</div><div class="tr">Dashboard — Paginas 1 e 2</div></div>
+      <div class="tc"><div class="av a">MT</div><div class="tn">Mateus</div><div class="tr">Dashboard — Paginas 3 e 4</div></div>
+      <div class="tc"><div class="av" style="background:#9B59B6">MS</div><div class="tn">Matheus Soares</div><div class="tr">Modelagem e KPIs no Power BI</div></div>
+      <div class="tc"><div class="av r">CL</div><div class="tn">Clovis</div><div class="tr">Documentacao, slides, GitHub e consolidacao dos insights</div></div>
+    </div>
+    <div class="cols2 a4">
+      <div>
+        <h3>Fontes de dados</h3>
+        <table class="tbl">
+          <thead><tr><th>Fonte</th><th>Uso</th></tr></thead>
+          <tbody>
+            <tr><td>Censo Escolar / INEP 2025</td><td class="hi">Base principal</td></tr>
+            <tr><td>Plataforma Nilo Pecanha</td><td>Fonte complementar prevista</td></tr>
+            <tr><td>IBGE / SIDRA 2022</td><td>Indicadores per capita</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h3>Pipeline ETL</h3>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div class="ri"><div class="ric">📥</div><div class="rt"><strong>Extracao</strong>Microdados INEP + IBGE SIDRA</div></div>
+          <div class="ri"><div class="ric">🔧</div><div class="rt"><strong>Transformacao</strong>Python: pandas, numpy, openpyxl</div></div>
+          <div class="ri"><div class="ric">📊</div><div class="rt"><strong>Carga e Visualizacao</strong>CSVs tratados → Power BI (4 paginas)</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4. PANORAMA NACIONAL (Pag. 1) ══════════════════════════ -->
+<div class="slide" id="s4" style="background:var(--navy2)">
+  <div class="grid"></div>
+  <div style="max-width:880px;width:100%">
+    <div class="lbl a1">Dashboard — Pagina 1</div>
+    <h2 class="a2" style="margin-bottom:16px">Panorama Nacional</h2>
+    <div class="kpis a3" style="margin-bottom:18px">
+      <div class="kpi"><div class="kv">2,49M</div><div class="kl">Total de Matriculas</div></div>
+      <div class="kpi g"><div class="kv">12K</div><div class="kl">Instituicoes Tecnicas</div></div>
+      <div class="kpi a"><div class="kv">32K</div><div class="kl">Quantidade de Cursos</div></div>
+      <div class="kpi r"><div class="kv">207</div><div class="kl">Matriculas por Instituicao</div></div>
+    </div>
+    <div class="cols2 a4">
+      <div>
+        <h3>Matriculas por Regiao</h3>
+        <div class="bars">
+          <div class="bi"><div class="bm"><span class="bn">Sudeste</span><span class="bv">1,06M - 42,53%</span></div><div class="bt"><div class="bf" style="width:100%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">Nordeste</span><span class="bv">0,74M - 29,62%</span></div><div class="bt"><div class="bf g" style="width:69.6%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">Sul</span><span class="bv">0,41M - 16,50%</span></div><div class="bt"><div class="bf a" style="width:38.8%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">Centro-Oeste</span><span class="bv">0,14M - 5,73%</span></div><div class="bt"><div class="bf" style="width:13.2%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">Norte</span><span class="bv">0,14M - 5,63%</span></div><div class="bt"><div class="bf r" style="width:13.2%"></div></div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="hb"><strong>Insight do dashboard:</strong><br>O Sudeste concentra <strong>42,53%</strong> de todas as matriculas em cursos tecnicos, seguido pelo Nordeste com <strong>29,62%</strong>.</div>
+        <div class="hb a">A educacao tecnica esta presente em <strong>todas as regioes do Brasil</strong> — mas com distribuicao muito desigual.</div>
+      </div>
+    </div>
+  </div>
+  <div class="src">Censo da Educacao Basica 2025 — INEP | Fevereiro/2026</div>
+</div>
+
+<!-- ══ 5. REGIONAL (Pag. 2) ═══════════════════════════════════ -->
+<div class="slide" id="s5" style="background:var(--navy)">
+  <div class="grid"></div>
+  <div style="max-width:880px;width:100%">
+    <div class="lbl a1">Dashboard — Pagina 2</div>
+    <h2 class="a2" style="margin-bottom:16px">Visao Regional</h2>
+    <div class="cols2 a3">
+      <div>
+        <h3>Ranking dos Estados (Top 5)</h3>
+        <div class="bars" style="margin-bottom:14px">
+          <div class="bi"><div class="bm"><span class="bn">SP — Sao Paulo</span><span class="bv">0,57M</span></div><div class="bt"><div class="bf" style="width:100%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">MG — Minas Gerais</span><span class="bv">0,27M</span></div><div class="bt"><div class="bf g" style="width:44%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">BA — Bahia</span><span class="bv">0,19M</span></div><div class="bt"><div class="bf a" style="width:32%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">PR — Parana</span><span class="bv">0,17M</span></div><div class="bt"><div class="bf" style="width:28%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">RJ — Rio de Janeiro</span><span class="bv">0,15M</span></div><div class="bt"><div class="bf r" style="width:25%"></div></div></div>
+        </div>
+        <h3>% de Cursos por Regiao</h3>
+        <table class="tbl">
+          <thead><tr><th>Regiao</th><th>% Cursos</th><th>% Matriculas</th></tr></thead>
+          <tbody>
+            <tr><td>Sudeste</td><td class="hi">44,66%</td><td>42,53%</td></tr>
+            <tr><td>Nordeste</td><td class="hi">27,12%</td><td>29,62%</td></tr>
+            <tr><td>Sul</td><td class="hi">14,98%</td><td>16,50%</td></tr>
+            <tr><td>Centro-Oeste</td><td class="hi">6,73%</td><td>5,73%</td></tr>
+            <tr><td>Norte</td><td class="hi">6,51%</td><td>5,63%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="hb"><strong>SP lidera isolado</strong> com 0,57M matriculas — mais do que toda a regiao Norte + Centro-Oeste juntos.</div>
+        <div class="hb g">As <strong>top 5 areas profissionais</strong> por regiao seguem a mesma ordem nacional: Gestao, Saude, TI, Controle de Processos e Recursos Naturais.</div>
+        <div class="hb a">A diferenca entre % de cursos e % de matriculas no Nordeste (20% vs 29%) indica <strong>turmas maiores</strong> — possivelmente menor infraestrutura e mais alunos por escola.</div>
+      </div>
+    </div>
+  </div>
+  <div class="src">Censo da Educacao Basica 2025 — INEP | Fevereiro/2026</div>
+</div>
+
+<!-- ══ 6. PERFIL — REDES E LOCALIZACAO (Pag. 3) ════════════════ -->
+<div class="slide" id="s6" style="background:var(--navy2)">
+  <div class="grid"></div>
+  <div style="max-width:880px;width:100%">
+    <div class="lbl a1">Dashboard — Pagina 3</div>
+    <h2 class="a2" style="margin-bottom:16px">Perfil dos Cursos — Redes e Localizacao</h2>
+    <div class="cols2 a3">
+      <div>
+        <h3>Quantidade de Cursos por Rede</h3>
+        <div class="bars" style="margin-bottom:16px">
+          <div class="bi"><div class="bm"><span class="bn">Estadual</span><span class="bv">19K · 58,76%</span></div><div class="bt"><div class="bf" style="width:100%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">Privada</span><span class="bv">10K · 31,38%</span></div><div class="bt"><div class="bf a" style="width:53.4%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">Federal</span><span class="bv">3K · 8,95%</span></div><div class="bt"><div class="bf g" style="width:15.2%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">Municipal</span><span class="bv">&lt; 1%</span></div><div class="bt"><div class="bf r" style="width:1.4%"></div></div></div>
+        </div>
+        <h3>Matriculas por Localizacao</h3>
+        <div class="bars">
+          <div class="bi"><div class="bm"><span class="bn">Urbana</span><span class="bv">2,37Mi · 95,2%</span></div><div class="bt"><div class="bf" style="width:100%"></div></div></div>
+          <div class="bi"><div class="bm"><span class="bn">Rural</span><span class="bv">0,12Mi · 4,8%</span></div><div class="bt"><div class="bf a" style="width:5.1%"></div></div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="kpi"><div class="kv" style="font-size:22px">Estadual</div><div class="kl">Rede com maior oferta — 58,76% dos cursos</div></div>
+        <div class="hb">A rede <strong>Estadual domina</strong> em volume, mas a Privada e relevante em areas de alto retorno (Saude, Seguranca).</div>
+        <div class="hb a" style="font-size:12px">
+          <strong style="display:block;margin-bottom:3px">Desigualdade urbano-rural: 20:1</strong>
+          2,37 Mi de matriculas urbanas contra apenas 0,12 Mi rurais — barreira estrutural ao campo.
+        </div>
+        <div class="hb r" style="font-size:12px">Jovens do campo tem acesso <strong>20 vezes menor</strong> a formacao tecnica que jovens urbanos.</div>
+      </div>
+    </div>
+  </div>
+  <div class="src">Censo da Educacao Basica 2025 — INEP | Dashboard Pag. 3</div>
+</div>
+
+<!-- ══ 7. PERFIL — TOP 10 AREAS (Pag. 3) ══════════════════════ -->
+<div class="slide" id="s7" style="background:var(--navy)">
+  <div class="grid"></div>
+  <div style="max-width:880px;width:100%">
+    <div class="lbl a1">Dashboard — Pagina 3</div>
+    <h2 class="a2" style="margin-bottom:16px">Top 10 Areas Profissionais por Matriculas</h2>
+    <div class="cols2 a3">
+      <div class="bars">
+        <div class="bi"><div class="bm"><span class="bn">Gestao e negocios</span><span class="bv">0,71Mi</span></div><div class="bt"><div class="bf" style="width:100%"></div></div></div>
+        <div class="bi"><div class="bm"><span class="bn">Ambiente e saude</span><span class="bv">0,50Mi</span></div><div class="bt"><div class="bf g" style="width:70.4%"></div></div></div>
+        <div class="bi"><div class="bm"><span class="bn">Informacao e comunicacao</span><span class="bv">0,42Mi</span></div><div class="bt"><div class="bf a" style="width:59.2%"></div></div></div>
+        <div class="bi"><div class="bm"><span class="bn">Controle e processos ind.</span><span class="bv">0,29Mi</span></div><div class="bt"><div class="bf" style="width:40.8%"></div></div></div>
+        <div class="bi"><div class="bm"><span class="bn">Recursos naturais</span><span class="bv">0,17Mi</span></div><div class="bt"><div class="bf g" style="width:23.9%"></div></div></div>
+        <div class="bi"><div class="bm"><span class="bn">Seguranca</span><span class="bv">0,10Mi</span></div><div class="bt"><div class="bf a" style="width:14.1%"></div></div></div>
+        <div class="bi"><div class="bm"><span class="bn">Producao industrial</span><span class="bv">0,06Mi</span></div><div class="bt"><div class="bf r" style="width:8.5%"></div></div></div>
+        <div class="bi"><div class="bm"><span class="bn">Infraestrutura</span><span class="bv">0,05Mi</span></div><div class="bt"><div class="bf" style="width:7%"></div></div></div>
+        <div class="bi"><div class="bm"><span class="bn">Prod. cultural e design</span><span class="bv">0,05Mi</span></div><div class="bt"><div class="bf g" style="width:7%"></div></div></div>
+        <div class="bi"><div class="bm"><span class="bn">Turismo e hospitalidade</span><span class="bv">0,04Mi</span></div><div class="bt"><div class="bf a" style="width:5.6%"></div></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <div class="kpi"><div class="kv" style="font-size:22px">Gestao e Negocios</div><div class="kl">Area com maior numero de cursos (10 Mil) e matriculas (0,71 Mi)</div></div>
+        <div class="hb">As <strong>3 primeiras areas</strong> (Gestao, Saude, TI) concentram mais de <strong>50% de todas as matriculas</strong> nacionais.</div>
+        <div class="hb a">Areas como <strong>Industria</strong> e <strong>Agropecuaria</strong> tem representacao muito baixa em relacao a demanda do mercado regional.</div>
+        <div class="hb g">Quantidade de cursos por area confirma a mesma ordem: Gestao (10K), TI (6K), Saude (6K), Controle (4K), Rec. Naturais (2K).</div>
+      </div>
+    </div>
+  </div>
+  <div class="src">Censo da Educacao Basica 2025 — INEP | Dashboard Pag. 3</div>
+</div>
+
+<!-- ══ 8. INSIGHTS (Pag. 4) ════════════════════════════════════ -->
+<div class="slide" id="s8" style="background:var(--navy2)">
+  <div class="grid"></div>
+  <div style="max-width:900px;width:100%">
+    <div class="lbl a1">Dashboard — Pagina 4</div>
+    <h2 class="a2" style="margin-bottom:14px">Insights</h2>
+    <div class="kpis a3" style="margin-bottom:14px">
+      <div class="kpi"><div class="kv" style="font-size:18px">Gestao e Negocios</div><div class="kl">Principal Area Profissional</div></div>
+      <div class="kpi g"><div class="kv" style="font-size:18px">Estadual</div><div class="kl">Principal Rede de Ensino</div></div>
+      <div class="kpi a"><div class="kv">207,06</div><div class="kl">Matriculas por Instituicao</div></div>
+    </div>
+    <div class="cols2 a4">
+      <div>
+        <h3 style="margin-bottom:8px">Area Profissional vs. Redes</h3>
+        <table class="tbl">
+          <thead><tr><th>Area</th><th>Estadual</th><th>Federal</th><th>Privada</th></tr></thead>
+          <tbody>
+            <tr><td>Gestao e negocios</td><td class="hi">486.161</td><td>42.487</td><td>177.015</td></tr>
+            <tr><td>Ambiente e saude</td><td>150.957</td><td>22.855</td><td class="hi">326.327</td></tr>
+            <tr><td>Informacao e com.</td><td class="hi">276.761</td><td>67.652</td><td>75.930</td></tr>
+            <tr><td>Controle proc. ind.</td><td>94.178</td><td class="hi">64.258</td><td>132.616</td></tr>
+            <tr><td>Recursos naturais</td><td>96.098</td><td class="hi">48.470</td><td>24.055</td></tr>
+            <tr><td>Seguranca</td><td>36.502</td><td>9.231</td><td class="hi">52.608</td></tr>
+            <tr><td><strong>Total</strong></td><td><strong>1.289.453</strong></td><td><strong>330.505</strong></td><td><strong>846.095</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h3 style="margin-bottom:8px">Area Profissional vs. Regiao</h3>
+        <table class="tbl">
+          <thead><tr><th>Area</th><th>C-Oeste</th><th>Nordeste</th><th>Norte</th></tr></thead>
+          <tbody>
+            <tr><td>Gestao e negocios</td><td>30.844</td><td class="hi">203.699</td><td>23.034</td></tr>
+            <tr><td>Ambiente e saude</td><td>26.636</td><td class="hi">148.972</td><td>38.808</td></tr>
+            <tr><td>Informacao e com.</td><td>26.933</td><td class="hi">150.275</td><td>24.528</td></tr>
+            <tr><td>Recursos naturais</td><td>14.965</td><td class="hi">56.961</td><td>18.076</td></tr>
+            <tr><td>Controle proc. ind.</td><td>20.506</td><td class="hi">64.692</td><td>13.232</td></tr>
+            <tr><td>Seguranca</td><td>5.085</td><td class="hi">26.528</td><td>8.155</td></tr>
+            <tr><td><strong>Total</strong></td><td><strong>142.578</strong></td><td><strong>737.597</strong></td><td><strong>140.094</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="src">Censo da Educacao Basica 2025 — INEP | Dashboard Pag. 4</div>
+</div>
+
+<!-- ══ 9. ANALISE + RECOMENDACOES ══════════════════════════════ -->
+<div class="slide" id="s9" style="background:var(--navy)">
+  <div class="grid"></div>
+  <div class="orb" style="width:340px;height:340px;background:rgba(13,187,126,.05);top:-60px;right:-60px"></div>
+  <div style="max-width:880px;width:100%">
+    <div class="lbl a1">Analise e Recomendacoes</div>
+    <h2 class="a2" style="margin-bottom:16px">O que os dados revelam — e o que fazer</h2>
+    <div class="cols2 a3">
+      <div>
+        <h3 style="margin-bottom:9px">Principais achados</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="hb" style="font-size:12px"><strong>Rede Estadual</strong> lidera Gestao (486K) e TI (276K) — areas de menor custo operacional.</div>
+          <div class="hb g" style="font-size:12px"><strong>Rede Privada</strong> domina Saude (326K) e Seguranca (52K) — areas de maior retorno financeiro.</div>
+          <div class="hb a" style="font-size:12px"><strong>Nordeste</strong> aparece em segundo lugar no volume absoluto (737K), atras do Sudeste.</div>
+          <div class="hb r" style="font-size:12px">Razao <strong>20:1 urbano/rural</strong> — barreira estrutural ao acesso no campo.</div>
+        </div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:9px">Recomendacoes</h3>
+        <div class="rl">
+          <div class="ri"><div class="ric">🌾</div><div class="rt"><strong>Expandir acesso rural</strong>EaD e polos descentralizados — reduzir razao 20:1</div></div>
+          <div class="ri"><div class="ric">📐</div><div class="rt"><strong>Diversificar areas</strong>Ampliar Industria e Agropecuaria alem de Gestao e Saude</div></div>
+          <div class="ri"><div class="ric">🏛️</div><div class="rt"><strong>Fortalecer Rede Federal</strong>Alta qualidade com apenas 8,95% — ampliar como vetor de equidade</div></div>
+          <div class="ri"><div class="ric">📊</div><div class="rt"><strong>Monitorar per capita</strong>Usar matriculas por 100 mil hab. como KPI de equidade por UF</div></div>
+          <div class="ri"><div class="ric">🤝</div><div class="rt"><strong>PPPs em Saude</strong>Privado domina (326K) — democratizar via parcerias publico-privadas</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 10. ENCERRAMENTO ═════════════════════════════════════════ -->
+<div class="slide" id="s10" style="background:linear-gradient(135deg,#0A1628 0%,#0F2A50 100%)">
+  <div class="grid"></div>
+  <div class="orb" style="width:520px;height:520px;background:rgba(0,197,212,.05);top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+  <div style="text-align:center;max-width:700px">
+    <div class="lbl a1" style="animation:pulse 2.5s ease-in-out infinite">Obrigado!</div>
+    <div class="ct a2" style="margin-bottom:12px">Educacao Tecnica<br>no <em>Brasil</em></div>
+    <p class="sub a3" style="font-size:14px">Onde estao as oportunidades de formacao profissional?</p>
+    <div class="kpis a4" style="justify-content:center;margin-top:26px">
+      <div class="kpi" style="max-width:140px"><div class="kv">2,49M</div><div class="kl">Matriculas</div></div>
+      <div class="kpi g" style="max-width:140px"><div class="kv">32K</div><div class="kl">Cursos</div></div>
+      <div class="kpi a" style="max-width:140px"><div class="kv">42,5%</div><div class="kl">no Sudeste</div></div>
+      <div class="kpi r" style="max-width:140px"><div class="kv">5</div><div class="kl">Recomendacoes</div></div>
+    </div>
+    <div class="a5" style="margin-top:26px;display:flex;flex-direction:column;gap:5px">
+      <div style="font-size:11px;color:var(--muted)">Censo da Educacao Basica 2025 — INEP | Plataforma Nilo Pecanha — MEC | IBGE/SIDRA 2022</div>
+      <div style="font-size:11px;color:var(--muted)">github.com/miguelfcz/analytics-educacao-profissional-tecnica</div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+var TOTAL = 10;
+var cur = 1;
+
+function getS(n) { return document.getElementById('s' + n); }
+
+function nav(dir) {
+  var next = cur + dir;
+  if (next < 1 || next > TOTAL) return;
+  var prev = cur;
+  cur = next;
+  var pEl = getS(prev);
+  var cEl = getS(cur);
+  pEl.classList.remove('active');
+  if (dir > 0) {
+    pEl.classList.add('leaving');
+    setTimeout(function() { pEl.classList.remove('leaving'); }, 520);
+  }
+  cEl.classList.add('active');
+  updateHUD();
+}
+
+function updateHUD() {
+  document.getElementById('progress').style.width = (cur / TOTAL * 100) + '%';
+  document.getElementById('sc').textContent = cur + ' / ' + TOTAL;
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); nav(1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); nav(-1); }
+});
+
+var tx = 0;
+document.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; });
+document.addEventListener('touchend',   function(e) {
+  var dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 48) nav(dx < 0 ? 1 : -1);
+});
+
+updateHUD();
+</script>
+</body>
+</html>
